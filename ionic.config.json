@@ -1,5 +1,7 @@
 {
   "name": "gamer-mobile",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }

@@ -1,7 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 1
+      <span class="titulo" *ngIf="!partida.id"> Vamos começar? </span>
+      <span class="titulo" *ngIf="partida.id"> Total de pontos: {{ partida.pontos }} </span>
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,9 +10,54 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
+      <ion-title size="large">Vamos começar?</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="light" *ngIf="partida.id && !audioFundo.muted" (click)="ligarDesligarAudio()">
+      <ion-icon name="volume-high-outline"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button color="light" *ngIf="partida.id && audioFundo.muted" (click)="ligarDesligarAudio()">
+      <ion-icon name="volume-mute-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab> -->
+
+  <div id="container">
+
+    <ion-button color="warning" *ngIf="!partida.id" (click)="criarPartida()">
+      Começar uma nova partida
+      <ion-icon name="caret-forward-outline" slot="end"></ion-icon>
+    </ion-button>
+
+    <ion-list *ngIf="pergunta.id && partida.id">
+      <ion-list-header lines="inset">
+        <ion-label class="pergunta">{{pergunta.descricao}}</ion-label>
+      </ion-list-header>
+
+      <div *ngFor="let alternativa of pergunta.alternativas">
+        <ion-button color="{{alternativa.selecionada ? 'medium' : 'light'}}" expand="block"
+          (click)="selecionarAlternativa(alternativa)"
+          [disabled]="partida.id && resposta.correta !== undefined && resposta.correta !== null">
+          {{ alternativa.descricao }}
+        </ion-button>
+      </div>
+    </ion-list>
+
+    <ion-button color="primary" expand="block"
+      *ngIf="partida.id && (resposta.correta === undefined || resposta.correta === null)" (click)="responder()">
+      Responder</ion-button>
+    <ion-button color="success" expand="block" *ngIf="partida.id && resposta.correta" (click)="buscarProximaPergunta()">
+      Próxima pergunta</ion-button>
+    <ion-button color="danger" expand="block" *ngIf="partida.id && resposta.correta === false"
+      (click)="encerrarPartida()">
+      Encerrar
+      <ion-icon name="close-outline" slot="end"></ion-icon>
+    </ion-button>
+  </div>
 </ion-content>
+<ion-footer class="ion-no-border">
+  <ion-toolbar>
+    <ion-title><span id="time" class="text-primary" *ngIf="partida.id">00:30</span></ion-title>
+  </ion-toolbar>
+</ion-footer>

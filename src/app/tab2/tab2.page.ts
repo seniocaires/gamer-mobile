@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { ClassificacaoService } from '../api/classificacao.service';
+import { Classificacao } from '../shared/model/classificacao';
 
 @Component({
   selector: 'app-tab2',
@@ -7,6 +9,19 @@ import { Component } from '@angular/core';
 })
 export class Tab2Page {
 
-  constructor() {}
+  classificacoes: Classificacao[] = [];
+
+  constructor(private classificacaoService: ClassificacaoService) {
+  }
+
+  ionViewWillEnter() {
+    this.buscarClassificacao();
+  }
+
+  buscarClassificacao() {
+    this.classificacaoService.buscar().subscribe((classificacoesRegistradas: Classificacao[]) => {
+      this.classificacoes = classificacoesRegistradas;
+    });
+  }
 
 }

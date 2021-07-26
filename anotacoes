@@ -1,0 +1,24 @@
+
+    Run app with live reload (Android)
+
+ionic cap run android -l --external
+
+    Run app with live reload (iOS)
+
+ionic cap run ios -l --external
+
+    How to generate a release APK without opening the android studio
+
+ionic capacitor copy android --prod && cd android && ./gradlew assembleRelease && cd ..     
+
+    How to generate a debug APK without opening the android studio
+
+ionic capacitor copy android && cd android && ./gradlew assembleDebug && cd ..
+
+    How to generate icons & splash screen without specifying platform
+
+cordova-res --skip-config --copy
+
+    How to build and run apk directly on the device from CLI
+
+ionic capacitor copy android && cd android && ./gradlew assembleDebug && ./gradlew installDebug && cd ..
