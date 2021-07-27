@@ -51,6 +51,19 @@
   color: black;
 }
 
+.tempoAdicionado {
+  background: transparent !important;
+  --background: transparent !important;
+  --box-shadow: 0 !important;
+  --width:100%;
+  --min-height: 50px;
+  //position: absolute;
+  text-align: center;
+  font-size: x-large;
+  font-weight: bolder;
+  color: chartreuse;
+}
+
 .tempoAcabou {
   background: rgba(0, 0, 0, 0.5);
   --background:url(/assets/img/tempo-acabou.png);

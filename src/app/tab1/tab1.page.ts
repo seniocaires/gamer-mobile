@@ -29,7 +29,8 @@ export class Tab1Page extends AppPage {
 
   private minutos;
   private segundos;
-  private tempoTotal = 30;
+  private tempoParcial = 0;
+  private tempoTotal = 0;
   private intervalo = 1000;
   readonly observableRelogio: Observable<any>;
   private pararRelogio = new Subject<void>();
@@ -56,16 +57,17 @@ export class Tab1Page extends AppPage {
     this.observableRelogio.subscribe(() => {
 
       if (this.partida.id) {
-        this.minutos = Math.floor(this.tempoTotal / 60);
-        this.segundos = Math.floor(this.tempoTotal % 60);
+        // this.minutos = Math.floor(this.tempoTotal / 60);
+        // this.segundos = Math.floor(this.tempoTotal % 60);
 
-        this.minutos = this.minutos < 10 ? "0" + this.minutos : this.minutos;
-        this.segundos = this.segundos < 10 ? "0" + this.segundos : this.segundos;
+        // this.minutos = this.minutos < 10 ? "0" + this.minutos : this.minutos;
+        // this.segundos = this.segundos < 10 ? "0" + this.segundos : this.segundos;
 
-        document.getElementById('time').innerHTML = this.minutos + ":" + this.segundos;
+        document.getElementById('time').innerHTML = this.tempoFormatado(this.tempoTotal);//this.minutos + ":" + this.segundos;
         // this.relogio.textContent = this.minutos + ":" + this.segundos;
 
         --this.tempoTotal;
+        --this.tempoParcial;
         if (this.tempoTotal < 0) {
           this.pararRelogio.next();
           // this.encerrarPartida();
@@ -76,6 +78,16 @@ export class Tab1Page extends AppPage {
     });
   }
 
+  tempoFormatado(tempo: number) {
+    let minutos = Math.floor(tempo / 60);
+    let segundos = Math.floor(tempo % 60);
+
+    let minutosString = minutos < 10 ? "0" + minutos : minutos;
+    let segundosString = segundos < 10 ? "0" + segundos : segundos;
+
+    return minutosString + ":" + segundosString;
+  }
+
   reset() {
 
     this.encerrarPartida();
@@ -84,6 +96,7 @@ export class Tab1Page extends AppPage {
     this.pergunta = new Pergunta();
     this.alternativaSelecionada = new Alternativa();
     this.resposta = new Resposta();
+    this.tempoTotal = 0;
 
   }
 
@@ -94,6 +107,7 @@ export class Tab1Page extends AppPage {
 
   criarPartida() {
     this.ligarAudioFundo();
+    this.tempoTotal = 0
     this.partidaService.criar(this.usuario).subscribe((novaPartida: Partida) => {
       this.partida = novaPartida;
       this.buscarProximaPergunta();
@@ -116,7 +130,8 @@ export class Tab1Page extends AppPage {
     this.perguntaService.buscarAleatoria().subscribe((perguntaAleatoria: Pergunta) => {
       this.pergunta = perguntaAleatoria;
       this.resposta = new Resposta();
-      this.tempoTotal = 15;
+      this.tempoParcial = 15;
+      this.tempoTotal = 15 + this.tempoTotal;
       this.pararRelogio.next();
       this.iniciarRelogio.next();
     });
@@ -147,12 +162,16 @@ export class Tab1Page extends AppPage {
         this.tocarAudio(Constantes.AUDIO_RESPOSTA_ERRADA);
         this.desligarAudioFundo();
         this.mensagemRespostaErrada();
-        this.partidaService.encerrar(this.partida.id).subscribe(_ => {});
+        this.partidaService.encerrar(this.partida.id).subscribe(_ => { });
+        this.tempoParcial = 0;
       } else {
         this.partida = partidaAtualizada;
         this.resposta.correta = true;
         this.tocarAudio(Constantes.AUDIO_RESPOSTA_CERTA);
         this.mensagemRespostaCerta();
+        if (this.tempoParcial > 0) {
+          this.tempoAdicionado(this.tempoFormatado(this.tempoParcial));
+        }
       }
     });
   }
@@ -171,6 +190,18 @@ export class Tab1Page extends AppPage {
     toast.onDidDismiss().then(_ => {
       this.encerrarPartida();
     });
+  }
+
+  async tempoAdicionado(tempo: string) {
+    const toast = await this.toastController.create({
+      duration: 1000,
+      cssClass: 'tempoAdicionado',
+      position: 'top',
+      message: `+ ${tempo} segundos`,
+      translucent: true,
+      color: undefined
+    });
+    toast.present();
   }
 
   async mensagemRespostaErrada() {
